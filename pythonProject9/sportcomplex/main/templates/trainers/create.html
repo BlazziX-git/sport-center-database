@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить тренера{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-user-plus"></i> Добавление нового тренера
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'trainer_list' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i> Назад
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label">ФИО тренера *</label>
+                        {{ form.full_name }}
+                        {% if form.full_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.full_name.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Специализация *</label>
+                            {{ form.specialization }}
+                            {% if form.specialization.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.specialization.errors }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted">Например: Фитнес, Йога, Бокс</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Стаж работы (лет) *</label>
+                            {{ form.experience_years }}
+                            {% if form.experience_years.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.experience_years.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Телефон *</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.phone.errors }}
+                        </div>
+                        {% endif %}
+                        <small class="text-muted">Формат: +7 (999) 123-45-67</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                Тренер активен (может проводить занятия)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save"></i> Сохранить тренера
+                        </button>
+                        <a href="{% url 'trainer_list' %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Автоформат телефона
+    $('#id_phone').on('input', function(e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+        e.target.value = !x[2] ? x[1] : '+' + x[1] + ' (' + x[2] + ') ' + x[3] + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+    });
+</script>
+{% endblock %}

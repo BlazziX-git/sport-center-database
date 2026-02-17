@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактировать тренера{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-user-edit"></i> Редактирование тренера: {{ trainer.full_name }}
+{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{% url 'trainer_detail' trainer.trainer_id %}" class="btn btn-info">
+        <i class="fas fa-eye"></i> Просмотр
+    </a>
+    <a href="{% url 'trainer_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Назад
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user-tie"></i> Данные тренера</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label">ФИО тренера *</label>
+                        {{ form.full_name }}
+                        {% if form.full_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.full_name.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Специализация *</label>
+                            {{ form.specialization }}
+                            {% if form.specialization.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.specialization.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Стаж работы (лет) *</label>
+                            {{ form.experience_years }}
+                            {% if form.experience_years.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.experience_years.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Телефон *</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.phone.errors }}
+                        </div>
+                        {% endif %}
+                        <small class="text-muted">Формат: +7 (999) 123-45-67</small>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                Тренер активен (может проводить занятия)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h6><i class="fas fa-info-circle"></i> Информация о тренере:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>ID тренера:</strong> {{ trainer.trainer_id }}</p>
+                                    <p class="mb-1"><strong>Дата найма:</strong> {{ trainer.created_at|date:"d.m.Y" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Статус:</strong> 
+                                        {% if trainer.is_active %}
+                                        <span class="badge bg-success">Активен</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Неактивен</span>
+                                        {% endif %}
+                                    </p>
+                                    <p class="mb-0"><strong>Проведено занятий:</strong> 0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                        <a href="{% url 'trainer_detail' trainer.trainer_id %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Предупреждение при деактивации -->
+        {% if trainer.is_active %}
+        <div class="card mt-4 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Внимание при деактивации
+                </h5>
+            </div>
+            <div class="card-body">
+                <p>Если вы деактивируете тренера:</p>
+                <ul>
+                    <li>Тренер не сможет проводить новые занятия</li>
+                    <li>Существующие записи останутся в истории</li>
+                    <li>Клиенты будут перенаправлены другим тренерам</li>
+                </ul>
+                <p class="mb-0">
+                    <strong>Рекомендуется:</strong> вместо деактивации изменить специализацию 
+                    или график работы.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Автоформат телефона
+    $('#id_phone').on('input', function(e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+        e.target.value = !x[2] ? x[1] : '+' + x[1] + ' (' + x[2] + ') ' + x[3] + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+    });
+</script>
+{% endblock %}

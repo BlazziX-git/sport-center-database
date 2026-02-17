@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - СпортКомплекс{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-chart-pie"></i> {{ title }}
+<small class="text-muted">Аналитика и статистика</small>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'reports_filter' %}" class="btn btn-primary">
+    <i class="fas fa-filter"></i> Фильтрация данных
+</a>
+<a href="{% url 'reports_statistics' %}" class="btn btn-info">
+    <i class="fas fa-chart-bar"></i> Полная статистика
+</a>
+<a href="{% url 'reports_comparison' %}" class="btn btn-success">
+    <i class="fas fa-balance-scale"></i> Сравнение данных
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Статистика за последний месяц -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Статистика за последний месяц</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">Новых клиентов</h6>
+                                <h2>{{ new_clients_month }}</h2>
+                                <small>За последние 30 дней</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">Новых абонементов</h6>
+                                <h2>{{ new_subscriptions_month }}</h2>
+                                <small>За последние 30 дней</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">Общая выручка</h6>
+                                <h2>{{ month_revenue|floatformat:0 }} руб.</h2>
+                                <small>За последние 30 дней</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if popular_service %}
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="alert alert-success">
+                            <i class="fas fa-trophy"></i>
+                            <strong>Самая популярная услуга:</strong>
+                            {{ popular_service.service_name }} -
+                            {{ popular_service.price }} руб.
+                            ({{ popular_service.sub_count }} абонементов)
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-database"></i> Реальная статистика системы</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <h6 class="card-title">Услуги</h6>
+                                <h3>{{ real_stats.services.total }}</h3>
+                                <small>Активных: {{ real_stats.services.active }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h6 class="card-title">Тренеры</h6>
+                                <h3>{{ real_stats.trainers.total }}</h3>
+                                <small>Активных: {{ real_stats.trainers.active }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <h6 class="card-title">Клиенты</h6>
+                                <h3>{{ real_stats.clients.total }}</h3>
+                                <small>С email: {{ real_stats.clients.with_email }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <h6 class="card-title">Абонементы</h6>
+                                <h3>{{ real_stats.subscriptions.total }}</h3>
+                                <small>Активных: {{ real_stats.subscriptions.active }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body">
+                                <h6 class="card-title">Записи на занятия</h6>
+                                <h3>{{ real_stats.bookings.total }}</h3>
+                                <small>Сегодня: {{ real_stats.bookings.today }} | Запланировано: {{ real_stats.bookings.scheduled }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-tasks"></i> Доступные отчеты</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{% url 'reports_filter' %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1"><i class="fas fa-filter text-primary"></i> Фильтрация данных</h6>
+                            <small class="badge bg-primary">LINQ-запросы</small>
+                        </div>
+                        <p class="mb-1 small text-muted">Аналог практической работы №8: 9 фильтров для анализа данных пользователей</p>
+                    </a>
+                    <a href="{% url 'reports_statistics' %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1"><i class="fas fa-chart-line text-success"></i> Полная статистика</h6>
+                            <small class="badge bg-success">Графики</small>
+                        </div>
+                        <p class="mb-1 small text-muted">Детальная статистика по всем разделам с визуализацией данных</p>
+                    </a>
+                    <a href="{% url 'reports_comparison' %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1"><i class="fas fa-balance-scale text-info"></i> Сравнение данных</h6>
+                            <small class="badge bg-info">Real vs Test</small>
+                        </div>
+                        <p class="mb-1 small text-muted">Сравнение реальных данных из БД с тестовыми сгенерированными данными</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-flask"></i> Тестовые данные (первые 10 пользователей)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    {{ test_users|safe }}
+                </div>
+                <div class="mt-3 text-end">
+                    <small class="text-muted">Сгенерировано для демонстрации фильтров</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Отчёты{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-chart-bar"></i> Отчёты
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Статистика за последний месяц</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <h3>{{ stats.new_clients }}</h3>
+                            <p>Новых клиентов</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <h3>{{ stats.new_subscriptions }}</h3>
+                            <p>Новых абонементов</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <h3>{{ stats.total_revenue }} руб.</h3>
+                            <p>Общая выручка</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <h3>{{ stats.popular_service.service_name|default:"-" }}</h3>
+                            <p>Самая популярная услуга</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - СпортКомплекс{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-balance-scale"></i> {{ title }}
+<small class="text-muted">Реальные vs Тестовые данные</small>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'reports_dashboard' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i> Назад
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-database"></i> Реальные данные</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Клиенты</th>
+                        <td>{{ real_stats.clients.total }}</td>
+                    </tr>
+                    <tr>
+                        <th>Тренеры</th>
+                        <td>{{ real_stats.trainers.total }}</td>
+                    </tr>
+                    <tr>
+                        <th>Услуги</th>
+                        <td>{{ real_stats.services.total }}</td>
+                    </tr>
+                    <tr>
+                        <th>Абонементы</th>
+                        <td>{{ real_stats.subscriptions.total }}</td>
+                    </tr>
+                    <tr>
+                        <th>Записи</th>
+                        <td>{{ real_stats.bookings.total }}</td>
+                    </tr>
+                    <tr>
+                        <th>Выручка</th>
+                        <td>{{ real_stats.subscriptions.total_revenue|floatformat:0 }} руб.</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-flask"></i> Тестовые данные</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Всего пользователей</th>
+                        <td>{{ test_stats.total_count }}</td>
+                    </tr>
+                    <tr>
+                        <th>Средний возраст</th>
+                        <td>{{ test_stats.avg_age|floatformat:1 }} лет</td>
+                    </tr>
+                    <tr>
+                        <th>Средний баланс</th>
+                        <td>{{ test_stats.avg_wallet|floatformat:0 }} руб.</td>
+                    </tr>
+                    <tr>
+                        <th>С подпиской</th>
+                        <td>{{ test_stats.subscribed_percent|floatformat:1 }}%</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление абонемента{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-exclamation-triangle text-danger"></i> Удаление абонемента
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'subscription_detail' subscription.subscription_id %}" class="btn btn-info">
+    <i class="fas fa-arrow-left"></i> Вернуться к абонементу
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-trash-alt"></i> Критическое действие
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-id-card fa-4x text-danger mb-3"></i>
+                    <h4>Вы собираетесь удалить абонемент</h4>
+                    <p class="lead">#{{ subscription.subscription_id }}</p>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6>Информация об абонементе:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>ID:</strong> #{{ subscription.subscription_id }}</p>
+                                <p><strong>Клиент:</strong> {{ subscription.client.full_name }}</p>
+                                <p><strong>Услуга:</strong> {{ subscription.service.service_name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Период:</strong> 
+                                    {{ subscription.start_date|date:"d.m.Y" }} — {{ subscription.end_date|date:"d.m.Y" }}
+                                </p>
+                                <p><strong>Статус:</strong> 
+                                    <span class="badge bg-{% if subscription.status == 'active' %}success{% elif subscription.status == 'expired' %}danger{% else %}warning{% endif %}">
+                                        {{ subscription.get_status_display }}
+                                    </span>
+                                </p>
+                                <p><strong>Сумма:</strong> {{ subscription.price_paid }} руб.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-danger">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-radiation"></i> Последствия удаления абонемента:
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Абонемент будет полностью удалён из системы</li>
+                        <li>Все посещения по этому абонементу будут удалены</li>
+                        <li>Клиент потеряет доступ к услуге</li>
+                        <li>Невозможность восстановления данных</li>
+                    </ul>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-lightbulb"></i> Альтернативные решения:
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Изменение статуса:</strong></p>
+                            <a href="{% url 'subscription_edit' subscription.subscription_id %}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Изменить статус
+                            </a>
+                            <p class="small text-muted mt-1">Например, на "отменён" вместо удаления</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Возврат средств:</strong></p>
+                            <button class="btn btn-sm btn-info" disabled>
+                                <i class="fas fa-undo-alt"></i> Оформить возврат
+                            </button>
+                            <p class="small text-muted mt-1">Если нужно вернуть деньги клиенту</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a href="{% url 'subscription_edit' subscription.subscription_id %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Редактировать вместо удаления
+                    </a>
+                    <a href="{% url 'subscription_detail' subscription.subscription_id %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Отмена
+                    </a>
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" 
+                                onclick="return confirm('ВНИМАНИЕ! Это действие нельзя отменить. Вы уверены?')">
+                            <i class="fas fa-trash"></i> Подтвердить удаление
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card bg-light mt-4">
+                    <div class="card-body">
+                        <h6><i class="fas fa-file-contract"></i> Юридическая информация:</h6>
+                        <p class="small text-muted mb-0">
+                            Удаление действующего абонемента может нарушать условия договора 
+                            с клиентом. Рекомендуется оформить официальное расторжение 
+                            договора перед удалением абонемента.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

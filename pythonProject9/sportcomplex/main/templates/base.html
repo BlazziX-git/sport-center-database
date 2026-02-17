@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Спортивный Комплекс{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --danger: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --sidebar: #1a1a2e;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, #4361ee, #7209b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar {
+            background: var(--sidebar);
+            min-height: calc(100vh - 76px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px 0;
+        }
+
+        .sidebar .nav-link {
+            color: #b0b7c3;
+            padding: 15px 25px;
+            margin: 5px 15px;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(67, 97, 238, 0.1);
+            color: #fff;
+            transform: translateX(10px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.2);
+        }
+
+        .sidebar .nav-link.active {
+            background: linear-gradient(45deg, #4361ee, #7209b7);
+            color: white;
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .sidebar .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: #4cc9f0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .sidebar .nav-link i {
+            width: 24px;
+            text-align: center;
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        .sidebar .nav-link span {
+            flex: 1;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            margin: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            min-height: calc(100vh - 126px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background: var(--card-bg);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.bg-primary {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%) !important;
+        }
+
+        .card.bg-success {
+            background: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%) !important;
+        }
+
+        .card.bg-warning {
+            background: linear-gradient(135deg, #f72585 0%, #b5179e 100%) !important;
+        }
+
+        .card.bg-info {
+            background: linear-gradient(135deg, #7209b7 0%, #560bad 100%) !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4361ee, #7209b7);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4cc9f0, #4895ef);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f72585, #b5179e);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .table {
+            --bs-table-bg: transparent;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background: linear-gradient(45deg, #4361ee, #7209b7);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(67, 97, 238, 0.05);
+            transform: scale(1.002);
+            transition: all 0.2s;
+        }
+
+        .badge {
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-weight: 600;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(45deg, #4361ee, #7209b7);
+            border-color: #4361ee;
+            border-radius: 8px;
+        }
+
+        .user-role-badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+            transform: translateY(-2px);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content > * {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .navbar .dropdown-menu {
+            z-index: 9999 !important;
+        }
+
+        .navbar {
+            z-index: 1000;
+        }
+
+        /* Стили для профиля */
+        .avatar-circle {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, #4361ee, #7209b7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .avatar-circle span {
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .list-group-item {
+            border: none;
+            padding: 10px 0;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -38px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .timeline-content {
+            padding-left: 0;
+        }
+
+        .card-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #eee;
+            height: 100%;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-color: #4361ee;
+        }
+
+        .card-hover .card-body {
+            padding: 20px 10px;
+        }
+
+        .service-card {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .service-card.selected {
+            border-color: #4361ee;
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .service-radio:checked ~ .service-card {
+            border-color: #4361ee;
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .stat-card h3 {
+            color: #4361ee;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        /* Стили для записей на занятия */
+        .booking-card {
+            border-left: 4px solid #4361ee;
+        }
+
+        .booking-card.completed {
+            border-left-color: #4cc9f0;
+        }
+
+        .booking-card.cancelled {
+            border-left-color: #f72585;
+        }
+
+        .booking-card.no-show {
+            border-left-color: #ffc107;
+        }
+
+        .time-badge {
+            background: linear-gradient(45deg, #4361ee, #7209b7);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .text-white-50 {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        hr.text-white-50 {
+            background-color: rgba(255, 255, 255, 0.5);
+            opacity: 0.5;
+            height: 1px;
+            border: none;
+            margin: 1rem 0;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Навигационная панель -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg, #2c3e50 0%, #4a6491 100%);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <i class="fas fa-dumbbell"></i> СпортКомплекс
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle"></i> {{ user.userName }}
+                        <span class="user-role-badge {% if user.role == 'admin' %}bg-danger{% elif user.role == 'manager' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                            {{ user.get_role_display }}
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Профиль</a></li>
+                        {% if user.role == 'admin' or user.is_superuser %}
+                        <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="fas fa-cog"></i> Админ-панель</a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+                {% else %}
+                <a class="nav-link" href="{% url 'login' %}">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Боковая панель -->
+            {% if user.is_authenticated %}
+            <div class="col-md-3 col-lg-2 sidebar d-none d-md-block">
+                <nav class="nav flex-column">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">
+                        <i class="fas fa-home"></i>
+                        <span>Главная</span>
+                    </a>
+
+                    <!-- Для админов и менеджеров -->
+                    {% if user.role == 'admin' or user.role == 'manager' or user.is_superuser %}
+                    <a class="nav-link {% if 'client' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'client_list' %}">
+                        <i class="fas fa-users"></i>
+                        <span>Клиенты</span>
+                    </a>
+                    <a class="nav-link {% if 'trainer' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'trainer_list' %}">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Тренеры</span>
+                    </a>
+                    <a class="nav-link {% if 'service' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'service_list' %}">
+                        <i class="fas fa-list-alt"></i>
+                        <span>Услуги</span>
+                    </a>
+                    <a class="nav-link {% if 'subscription' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'subscription_list' %}">
+                        <i class="fas fa-id-card"></i>
+                        <span>Абонементы</span>
+                    </a>
+                    <a class="nav-link {% if 'manage_bookings' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'manage_bookings' %}">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Записи на занятия</span>
+                    </a>
+
+                    <!-- ОТЧЕТЫ - ИСПРАВЛЕНО: убраны дубликаты, добавлен правильный URL -->
+                    <a class="nav-link {% if request.resolver_match.url_name == 'reports_dashboard' or request.resolver_match.url_name == 'reports_filter' or request.resolver_match.url_name == 'reports_statistics' or request.resolver_match.url_name == 'reports_comparison' %}active{% endif %}" href="{% url 'reports_dashboard' %}">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Отчёты</span>
+                    </a>
+
+                    <hr class="text-white-50 my-3">
+
+                    <a class="nav-link {% if 'schedule' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'schedule' %}">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Расписание</span>
+                    </a>
+                    {% endif %}
+
+                    <!-- Для клиентов -->
+                    {% if user.role == 'client' %}
+                        {% if user.client_profile %}
+                            <a class="nav-link {% if 'my_schedule' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'my_schedule' %}">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Мои занятия</span>
+                            </a>
+                            <a class="nav-link {% if 'my_subscriptions' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'my_subscriptions' %}">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Мой абонемент</span>
+                            </a>
+                            <a class="nav-link {% if 'book_training' in request.resolver_match.url_name or 'quick_book' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'book_training' %}">
+                                <i class="fas fa-calendar-plus"></i>
+                                <span>Запись на занятие</span>
+                            </a>
+                            <a class="nav-link {% if 'buy_subscription' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'buy_subscription' %}">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Купить абонемент</span>
+                            </a>
+                        {% else %}
+                            <a class="nav-link {% if 'link_profile' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'link_client_profile' %}">
+                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                                <span>Привязать профиль</span>
+                            </a>
+                        {% endif %}
+                        <hr class="text-white-50 my-3">
+                    {% endif %}
+
+                    <!-- Для тренеров -->
+                    {% if user.role == 'trainer' %}
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Моё расписание</span>
+                    </a>
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-users"></i>
+                        <span>Мои клиенты</span>
+                    </a>
+                    <hr class="text-white-50 my-3">
+                    {% endif %}
+
+                    <!-- Для всех авторизованных -->
+                    <a class="nav-link {% if 'profile' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'profile' %}">
+                        <i class="fas fa-user"></i>
+                        <span>Профиль</span>
+                    </a>
+                    <a class="nav-link {% if 'settings' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'settings' %}">
+                        <i class="fas fa-cog"></i>
+                        <span>Настройки</span>
+                    </a>
+                </nav>
+            </div>
+            {% endif %}
+
+            <!-- Основной контент -->
+            <div class="{% if user.is_authenticated %}col-md-9 col-lg-10{% else %}col-12{% endif %}">
+                <div class="content">
+                    <!-- Сообщения -->
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Заголовок страницы -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>{% block page_title %}{% endblock %}</h2>
+                        {% block page_actions %}{% endblock %}
+                    </div>
+
+                    <!-- Контент страницы -->
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- jQuery (для AJAX) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Скрипты -->
+    <script>
+        // Автоматическое скрытие сообщений через 5 секунд
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 5000);
+        });
+
+        // Подтверждение удаления
+        function confirmDelete(message) {
+            return confirm(message || 'Вы уверены, что хотите удалить этот элемент?');
+        }
+
+        // Функция для обновления профиля через AJAX
+        function updateProfile() {
+            const form = $('#profileForm');
+            const formData = form.serialize();
+
+            $.ajax({
+                url: '{% url "update_profile" %}',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        alert('Профиль успешно обновлен!');
+                        location.reload();
+                    }
+                },
+                error: function(xhr) {
+                    alert('Ошибка при обновлении профиля');
+                }
+            });
+        }
+
+        // Функция для покупки абонемента
+        function buySubscription(serviceId, months) {
+            if (confirm('Вы уверены, что хотите приобрести этот абонемент?')) {
+                $.ajax({
+                    url: '{% url "buy_subscription" %}',
+                    type: 'POST',
+                    data: {
+                        'service': serviceId,
+                        'months': months,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Абонемент успешно приобретен!');
+                            window.location.href = '{% url "my_subscriptions" %}';
+                        } else {
+                            alert(response.error || 'Ошибка при покупке абонемента');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('Ошибка при покупке абонемента');
+                    }
+                });
+            }
+        }
+
+        // Функция для отмены абонемента
+        function cancelSubscription(subscriptionId) {
+            if (confirm('Вы уверены, что хотите отменить этот абонемент?')) {
+                window.location.href = '{% url "cancel_subscription" 0 %}'.replace('0', subscriptionId);
+            }
+        }
+
+        // Функция для быстрой записи на занятие
+        function quickBook(serviceName) {
+            if (confirm('Вы уверены, что хотите записаться на ' + serviceName + '?')) {
+                // Здесь будет AJAX запрос для быстрой записи
+                // Пока просто показываем сообщение
+                alert('Функция быстрой записи активирована! Вы будете перенаправлены на форму записи.');
+
+                // В реальном приложении здесь будет перенаправление на страницу записи
+                // с предзаполненной услугой
+                // window.location.href = '{% url "quick_book_with_service" 0 %}'.replace('0', serviceId);
+            }
+        }
+
+        // Функция для записи на занятие (детальная форма)
+        function bookTraining(serviceId, date, time, trainerId) {
+            // Здесь будет AJAX запрос для записи на занятие
+            alert('Функция записи на занятие активирована! Вы будете перенаправлены на форму записи.');
+
+            // В реальном приложении здесь будет перенаправление на страницу записи
+            // window.location.href = '{% url "book_training" %}';
+        }
+
+        // Функция для отмены записи на занятие
+        function cancelBooking(bookingId, bookingDate, bookingTime) {
+            if (confirm('Вы уверены, что хотите отменить запись на ' + bookingDate + ' в ' + bookingTime + '?')) {
+                window.location.href = '{% url "cancel_booking" 0 %}'.replace('0', bookingId);
+            }
+        }
+
+        // Функция для получения доступного времени для записи
+        function getAvailableTimes(date, serviceId) {
+            $.ajax({
+                url: '{% url "get_available_times" %}',
+                type: 'GET',
+                data: {
+                    'date': date,
+                    'service_id': serviceId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Обновляем список доступных времен
+                        console.log('Доступные слоты:', response.available_slots);
+                        // Здесь можно обновить UI с доступными временами
+                    } else {
+                        alert('Ошибка при получении доступного времени');
+                    }
+                },
+                error: function(xhr) {
+                    alert('Ошибка при получении доступного времени');
+                }
+            });
+        }
+
+        // Функция для получения цены услуги
+        function getServicePrice(serviceId) {
+            $.ajax({
+                url: '{% url "get_service_price" 0 %}'.replace('0', serviceId),
+                type: 'GET',
+                success: function(response) {
+                    if (response.price) {
+                        // Обновляем цену на странице
+                        $('#servicePrice').text(response.price + ' руб.');
+                    } else {
+                        alert('Ошибка при получении цены услуги');
+                    }
+                },
+                error: function(xhr) {
+                    alert('Ошибка при получении цены услуги');
+                }
+            });
+        }
+
+        // Инициализация датапикера
+        $(function() {
+            // Инициализация всех элементов с классом datepicker
+            $('.datepicker').datepicker({
+                dateFormat: 'yy-mm-dd',
+                minDate: 0, // Минимальная дата - сегодня
+                changeMonth: true,
+                changeYear: true,
+                yearRange: '2024:2025'
+            });
+        });
+
+        // Инициализация таймпикера
+        $(function() {
+            // Инициализация всех элементов с классом timepicker
+            $('.timepicker').timepicker({
+                timeFormat: 'HH:mm',
+                interval: 30,
+                minTime: '07:00',
+                maxTime: '22:00',
+                startTime: '07:00',
+                dynamic: false,
+                dropdown: true,
+                scrollbar: true
+            });
+        });
+
+        // Функция для проверки доступности времени при выборе даты
+        $('input[name="booking_date"]').on('change', function() {
+            var selectedDate = $(this).val();
+            var serviceId = $('#id_service').val();
+
+            if (selectedDate && serviceId) {
+                getAvailableTimes(selectedDate, serviceId);
+            }
+        });
+
+        // Функция для проверки доступности времени при выборе услуги
+        $('#id_service').on('change', function() {
+            var serviceId = $(this).val();
+            var selectedDate = $('input[name="booking_date"]').val();
+
+            if (selectedDate && serviceId) {
+                getAvailableTimes(selectedDate, serviceId);
+            }
+
+            // Получаем цену услуги
+            if (serviceId) {
+                getServicePrice(serviceId);
+            }
+        });
+
+        // Функция для отображения/скрытия дополнительных полей
+        function toggleAdditionalFields() {
+            var showDetails = $('#showDetails').is(':checked');
+            if (showDetails) {
+                $('#additionalFields').slideDown();
+            } else {
+                $('#additionalFields').slideUp();
+            }
+        }
+
+        // Инициализация
+        $(document).ready(function() {
+            // Инициализация всех тултипов
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Инициализация всех поповеров
+            $('[data-bs-toggle="popover"]').popover();
+
+            // Инициализация счетчика символов для textarea
+            $('textarea[maxlength]').each(function() {
+                var maxLength = $(this).attr('maxlength');
+                var counter = $('<div class="text-muted small mt-1"></div>').insertAfter($(this));
+
+                $(this).on('input', function() {
+                    var currentLength = $(this).val().length;
+                    counter.text(currentLength + '/' + maxLength + ' символов');
+
+                    if (currentLength >= maxLength) {
+                        counter.addClass('text-danger');
+                    } else {
+                        counter.removeClass('text-danger');
+                    }
+                }).trigger('input');
+            });
+        });
+
+        // Функция для валидации формы перед отправкой
+        function validateForm(formId) {
+            var form = $('#' + formId);
+            var isValid = true;
+
+            // Проверка обязательных полей
+            form.find('[required]').each(function() {
+                if (!$(this).val()) {
+                    isValid = false;
+                    $(this).addClass('is-invalid');
+                    $(this).next('.invalid-feedback').text('Это поле обязательно для заполнения');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Проверка email
+            var emailField = form.find('input[type="email"]');
+            if (emailField.length && emailField.val()) {
+                var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailField.val())) {
+                    isValid = false;
+                    emailField.addClass('is-invalid');
+                    emailField.next('.invalid-feedback').text('Введите корректный email адрес');
+                }
+            }
+
+            // Проверка телефона
+            var phoneField = form.find('input[name="phone"]');
+            if (phoneField.length && phoneField.val()) {
+                var phoneRegex = /^\+7\s?\(?\d{3}\)?\s?\d{3}-?\d{2}-?\d{2}$/;
+                if (!phoneRegex.test(phoneField.val())) {
+                    isValid = false;
+                    phoneField.addClass('is-invalid');
+                    phoneField.next('.invalid-feedback').text('Введите телефон в формате +7 (999) 123-45-67');
+                }
+            }
+
+            return isValid;
+        }
+
+        // Обработчик отправки формы
+        $('form').on('submit', function(e) {
+            var formId = $(this).attr('id');
+            if (formId && !validateForm(formId)) {
+                e.preventDefault();
+                // Прокрутка к первой ошибке
+                $('.is-invalid').first().focus();
+            }
+        });
+
+        // Функция для фильтрации таблиц
+        function filterTable(tableId, inputId) {
+            var input = $('#' + inputId);
+            var filter = input.val().toUpperCase();
+            var table = $('#' + tableId);
+            var tr = table.find('tbody tr');
+
+            tr.each(function() {
+                var txtValue = $(this).text();
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        // Функция для сортировки таблиц
+        function sortTable(tableId, columnIndex) {
+            var table = $('#' + tableId);
+            var tbody = table.find('tbody');
+            var rows = tbody.find('tr').get();
+
+            rows.sort(function(a, b) {
+                var A = $(a).find('td').eq(columnIndex).text().toUpperCase();
+                var B = $(b).find('td').eq(columnIndex).text().toUpperCase();
+
+                if (A < B) return -1;
+                if (A > B) return 1;
+                return 0;
+            });
+
+            $.each(rows, function(index, row) {
+                tbody.append(row);
+            });
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

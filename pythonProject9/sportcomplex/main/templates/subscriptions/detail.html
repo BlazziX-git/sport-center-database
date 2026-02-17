@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}Абонемент #{{ subscription.subscription_id }}{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-id-card"></i> Абонемент #{{ subscription.subscription_id }}
+<small class="text-muted">от {{ subscription.created_at|date:"d.m.Y" }}</small>
+{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{% url 'subscription_edit' subscription.subscription_id %}" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Редактировать
+    </a>
+    <a href="{% url 'subscription_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Назад
+    </a>
+    {% if user.role == 'admin' or user.is_superuser %}
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        <i class="fas fa-trash"></i> Удалить
+    </button>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Основная информация -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Информация об абонементе</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">ID:</div>
+                    <div class="col-md-8">
+                        <span class="badge bg-dark">#{{ subscription.subscription_id }}</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Клиент:</div>
+                    <div class="col-md-8">
+                        <a href="{% url 'client_detail' subscription.client.client_id %}" class="text-decoration-none">
+                            <i class="fas fa-user"></i> {{ subscription.client.full_name }}
+                        </a>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Услуга:</div>
+                    <div class="col-md-8">
+                        <a href="{% url 'service_detail' subscription.service.service_id %}" class="text-decoration-none">
+                            <i class="fas fa-dumbbell"></i> {{ subscription.service.service_name }}
+                        </a>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Период:</div>
+                    <div class="col-md-8">
+                        <i class="far fa-calendar"></i> 
+                        {{ subscription.start_date|date:"d.m.Y" }} — {{ subscription.end_date|date:"d.m.Y" }}
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Статус:</div>
+                    <div class="col-md-8">
+                        <span class="badge bg-{% if subscription.status == 'active' %}success{% elif subscription.status == 'expired' %}danger{% else %}warning{% endif %}">
+                            {{ subscription.get_status_display }}
+                        </span>
+                        {% if days_left >= 0 %}
+                        <span class="badge bg-info ms-2">
+                            Осталось {{ days_left }} дней
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Оплаченная сумма:</div>
+                    <div class="col-md-8">
+                        <span class="badge bg-success" style="font-size: 1.1em;">
+                            {{ subscription.price_paid }} руб.
+                        </span>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Дата создания:</div>
+                    <div class="col-md-8">{{ subscription.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Быстрые действия -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if subscription.status == 'active' %}
+                    <a href="#" class="btn btn-success">
+                        <i class="fas fa-check-circle"></i> Отметить посещение
+                    </a>
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus"></i> Записать на занятие
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'subscription_edit' subscription.subscription_id %}" class="btn btn-outline-warning">
+                        <i class="fas fa-edit"></i> Изменить данные
+                    </a>
+                    <a href="{% url 'client_detail' subscription.client.client_id %}" class="btn btn-outline-info">
+                        <i class="fas fa-user"></i> Перейти к клиенту
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- История посещений -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history"></i> История посещений</h5>
+                {% if subscription.status == 'active' %}
+                <button class="btn btn-sm btn-success">
+                    <i class="fas fa-plus"></i> Добавить посещение
+                </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                    <h5>Нет записей о посещениях</h5>
+                    <p class="text-muted mb-4">Посещения ещё не отмечались</p>
+                    {% if subscription.status == 'active' %}
+                    <button class="btn btn-primary">
+                        <i class="fas fa-check-circle"></i> Отметить первое посещение
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Информация о продлении -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-alt"></i> 
+                    {% if is_expired %}
+                    Абонемент истёк
+                    {% else %}
+                    До окончания осталось
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if is_expired %}
+                <div class="alert alert-danger">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-exclamation-triangle"></i> Абонемент истёк!
+                    </h6>
+                    <p class="mb-0">
+                        Действие абонемента закончилось {{ subscription.end_date|date:"d.m.Y" }}.
+                    </p>
+                </div>
+                <a href="{% url 'subscription_create' %}?client={{ subscription.client.client_id }}" 
+                   class="btn btn-success w-100">
+                    <i class="fas fa-plus-circle"></i> Оформить новый абонемент
+                </a>
+                {% else %}
+                <div class="text-center">
+                    <h1 class="display-4 text-primary">{{ days_left }}</h1>
+                    <h5 class="text-muted">дней осталось</h5>
+                    <p class="text-muted mb-3">
+                        Дата окончания: {{ subscription.end_date|date:"d.m.Y" }}
+                    </p>
+                    <div class="progress mb-3" style="height: 10px;">
+                        {% with total_days=subscription.end_date|timesince:subscription.start_date %}
+                        <div class="progress-bar bg-success" 
+                             style="width: {% widthratio days_left total_days.days 100 %}%">
+                        </div>
+                        {% endwith %}
+                    </div>
+                    <a href="{% url 'subscription_edit' subscription.subscription_id %}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-calendar-plus"></i> Продлить абонемент
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно удаления -->
+{% if user.role == 'admin' or user.is_superuser %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Удаление абонемента
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <h6 class="alert-heading">Внимание!</h6>
+                    <p class="mb-0">Вы собираетесь удалить абонемент <strong>#{{ subscription.subscription_id }}</strong>.</p>
+                </div>
+                <p>Это действие приведёт к:</p>
+                <ul>
+                    <li>Удалению всех данных абонемента</li>
+                    <li>Удалению истории посещений</li>
+                    <li>Невозможности восстановления</li>
+                </ul>
+                <p class="text-danger">
+                    <i class="fas fa-info-circle"></i> Это действие нельзя отменить!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <form action="{% url 'subscription_delete' subscription.subscription_id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Удалить навсегда
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

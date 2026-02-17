@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ service.service_name }}{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-dumbbell"></i> {{ service.service_name }}
+<small class="text-muted">ID: {{ service.service_id }}</small>
+{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{% url 'service_edit' service.service_id %}" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Редактировать
+    </a>
+    <a href="{% url 'service_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Назад
+    </a>
+    {% if user.role == 'admin' or user.is_superuser %}
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        <i class="fas fa-trash"></i> Удалить
+    </button>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Основная информация -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Информация об услуге</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Название:</div>
+                    <div class="col-md-8">{{ service.service_name }}</div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Цена:</div>
+                    <div class="col-md-8">
+                        <span class="badge bg-success" style="font-size: 1.1em;">
+                            {{ service.price }} руб.
+                        </span>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Длительность:</div>
+                    <div class="col-md-8">
+                        <span class="badge bg-info">{{ service.duration }} минут</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Статус:</div>
+                    <div class="col-md-8">
+                        {% if service.is_active %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle"></i> Активна
+                        </span>
+                        {% else %}
+                        <span class="badge bg-danger">
+                            <i class="fas fa-times-circle"></i> Неактивна
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Дата добавления:</div>
+                    <div class="col-md-8">{{ service.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                <hr>
+                {% if service.description %}
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Описание:</div>
+                    <div class="col-md-8">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                {{ service.description|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Быстрые действия -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'subscription_create' %}" class="btn btn-success">
+                        <i class="fas fa-id-card"></i> Создать абонемент
+                    </a>
+                    <a href="{% url 'service_edit' service.service_id %}" class="btn btn-outline-warning">
+                        <i class="fas fa-edit"></i> Изменить данные
+                    </a>
+                    <button class="btn btn-outline-{% if service.is_active %}danger{% else %}success{% endif %}">
+                        <i class="fas fa-power-off"></i> 
+                        {% if service.is_active %}Деактивировать{% else %}Активировать{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Активные абонементы -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-id-card"></i> Активные абонементы
+                    <span class="badge bg-primary ms-2">{{ active_subscriptions.count }}</span>
+                </h5>
+                <a href="{% url 'subscription_create' %}" class="btn btn-sm btn-success">
+                    <i class="fas fa-plus"></i> Добавить
+                </a>
+            </div>
+            <div class="card-body">
+                {% if active_subscriptions %}
+                <div class="list-group">
+                    {% for sub in active_subscriptions %}
+                    <a href="{% url 'subscription_detail' sub.subscription_id %}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <h6 class="mb-1">
+                                <i class="fas fa-user"></i> {{ sub.client.full_name }}
+                            </h6>
+                            <span class="badge bg-{% if sub.status == 'active' %}success{% elif sub.status == 'expired' %}danger{% else %}warning{% endif %}">
+                                {{ sub.get_status_display }}
+                            </span>
+                        </div>
+                        <p class="mb-1">
+                            <small>
+                                <i class="far fa-calendar"></i> 
+                                {{ sub.start_date|date:"d.m.Y" }} — {{ sub.end_date|date:"d.m.Y" }}
+                            </small>
+                        </p>
+                        <p class="mb-1">
+                            <small>
+                                <i class="fas fa-money-bill-wave"></i> 
+                                Оплачено: {{ sub.price_paid }} руб.
+                            </small>
+                        </p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-id-card fa-3x text-muted mb-3"></i>
+                    <h5>Нет активных абонементов</h5>
+                    <p class="text-muted mb-4">На эту услугу пока нет оформленных абонементов</p>
+                    <a href="{% url 'subscription_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus-circle"></i> Создать первый абонемент
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Статистика -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Статистика услуги</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                            <h5>Всего клиентов</h5>
+                            <h3>{{ total_clients }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <i class="fas fa-money-bill-wave fa-2x text-success mb-2"></i>
+                            <h5>Общая выручка</h5>
+                            <h3>{{ total_revenue }} руб.</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно удаления -->
+{% if user.role == 'admin' or user.is_superuser %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Удаление услуги
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <h6 class="alert-heading">Внимание!</h6>
+                    <p class="mb-0">Вы собираетесь удалить услугу <strong>"{{ service.service_name }}"</strong>.</p>
+                </div>
+                <p>Это действие приведёт к:</p>
+                <ul>
+                    <li>Удалению всех данных услуги</li>
+                    <li>Отмене всех абонементов по этой услуге</li>
+                    <li>Невозможности восстановления</li>
+                </ul>
+                <p class="text-danger">
+                    <i class="fas fa-info-circle"></i> 
+                    {{ active_subscriptions.count }} активных абонементов будут отменены!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <form action="{% url 'service_delete' service.service_id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Удалить навсегда
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

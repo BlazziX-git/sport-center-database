@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Отмена записи на занятие{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-times-circle"></i> Отмена записи на занятие
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0 text-center">Подтверждение отмены</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+                    <h4>Вы уверены, что хотите отменить запись?</h4>
+                </div>
+                
+                <!-- Информация о записи -->
+                <div class="card border-warning mb-4">
+                    <div class="card-body">
+                        <h6>Информация о записи:</h6>
+                        <p><strong>ID:</strong> #{{ booking.booking_id }}</p>
+                        <p><strong>Услуга:</strong> {{ booking.service.service_name }}</p>
+                        <p><strong>Дата:</strong> {{ booking.booking_date|date:"d.m.Y" }}</p>
+                        <p><strong>Время:</strong> {{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}</p>
+                        {% if booking.trainer %}
+                        <p><strong>Тренер:</strong> {{ booking.trainer.full_name }}</p>
+                        {% endif %}
+                        <p><strong>Зал:</strong> {{ booking.room }}</p>
+                        <p><strong>Статус:</strong> 
+                            <span class="badge bg-info">{{ booking.get_status_display }}</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Правила отмены -->
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <strong>Внимание!</strong> 
+                    {% if booking.can_be_cancelled %}
+                        Отмена возможна минимум за 2 часа до начала занятия.
+                    {% else %}
+                        <span class="text-danger">Эту запись нельзя отменить онлайн. Пожалуйста, свяжитесь с администратором.</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Форма отмены -->
+                {% if booking.can_be_cancelled %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-times"></i> Да, отменить запись
+                        </button>
+                        <a href="{% url 'my_schedule' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Нет, вернуться назад
+                        </a>
+                    </div>
+                </form>
+                {% else %}
+                <div class="d-grid gap-2">
+                    <a href="{% url 'my_schedule' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Вернуться к расписанию
+                    </a>
+                    <a href="tel:+79999999999" class="btn btn-outline-primary">
+                        <i class="fas fa-phone"></i> Позвонить администратору
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

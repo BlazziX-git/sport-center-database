@@ -1,0 +1,561 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - Спортивный Комплекс{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-home"></i> Главная панель
+<small class="text-muted">Добро пожаловать, {{ user.userName }}!</small>
+{% endblock %}
+
+{% block page_actions %}
+<span class="badge bg-primary">
+    <i class="fas fa-clock"></i> {% now "d.m.Y H:i" %}
+</span>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Статистика для админов и менеджеров -->
+    {% if user.role == 'admin' or user.role == 'manager' or user.is_superuser %}
+    <!-- Основная статистика -->
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Клиенты</h5>
+                        <h2>{{ stats.clients_count }}</h2>
+                    </div>
+                    <i class="fas fa-users fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>
+                        <i class="fas fa-envelope"></i> {{ stats.clients_with_email }} с email ({{ stats.email_percentage }}%)<br>
+                        <i class="fas fa-birthday-cake"></i> Средний возраст: {{ stats.avg_age }} лет
+                    </small>
+                </div>
+                <a href="{% url 'client_list' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Управление клиентами →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Тренеры</h5>
+                        <h2>{{ stats.trainers_count }}</h2>
+                    </div>
+                    <i class="fas fa-user-tie fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>
+                        <i class="fas fa-user-check"></i> Активных: {{ stats.active_trainers_count }}<br>
+                        <i class="fas fa-chart-line"></i> Средний стаж: {{ stats.avg_experience|floatformat:1 }} лет
+                    </small>
+                </div>
+                <a href="{% url 'trainer_list' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Список тренеров →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Услуги</h5>
+                        <h2>{{ stats.services_count }}</h2>
+                    </div>
+                    <i class="fas fa-list-alt fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>
+                        <i class="fas fa-check-circle"></i> Активных: {{ stats.active_services_count }}<br>
+                        <i class="fas fa-money-bill"></i> Средняя цена: {{ stats.avg_price|floatformat:0 }} руб.<br>
+                        <i class="fas fa-clock"></i> Средняя длит.: {{ stats.avg_duration|floatformat:0 }} мин.
+                    </small>
+                </div>
+                <a href="{% url 'service_list' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Каталог услуг →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Абонементы</h5>
+                        <h2>{{ stats.subscriptions_count }}</h2>
+                    </div>
+                    <i class="fas fa-id-card fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>
+                        <i class="fas fa-chart-bar"></i> Выручка: {{ stats.total_revenue|floatformat:0 }} руб.<br>
+                        <i class="fas fa-fire"></i> Активных: {{ stats.active_subscriptions|length }}
+                    </small>
+                </div>
+                <a href="{% url 'subscription_list' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Все абонементы →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Вторая строка статистики -->
+    <div class="col-md-3 mb-3">
+        <div class="card bg-secondary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Сегодня</h5>
+                        <h2>{{ stats.today_bookings }}</h2>
+                    </div>
+                    <i class="fas fa-calendar-day fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>Занятий на сегодня</small>
+                </div>
+                <a href="{% url 'schedule' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Расписание →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-dark text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Предстоящие</h5>
+                        <h2>{{ stats.upcoming_bookings }}</h2>
+                    </div>
+                    <i class="fas fa-calendar-alt fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>Будущие занятия</small>
+                </div>
+                <a href="{% url 'manage_bookings' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Управление →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Завершено</h5>
+                        <h2>{{ stats.completed_bookings }}</h2>
+                    </div>
+                    <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>Всего: {{ stats.total_bookings }} занятий</small>
+                </div>
+                <a href="{% url 'reports_dashboard' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Отчёты →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Отменено</h5>
+                        <h2>{{ stats.cancelled_bookings }}</h2>
+                    </div>
+                    <i class="fas fa-times-circle fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>Отменённые занятия</small>
+                </div>
+                <a href="{% url 'manage_bookings' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Управление →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% elif user.role == 'client' %}
+    <!-- Статистика для клиентов -->
+    <div class="col-md-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Мои занятия</h5>
+                        <h2>{{ stats.today_bookings }}</h2>
+                    </div>
+                    <i class="fas fa-calendar-check fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>Сегодня: {{ stats.today_bookings }} | Всего: {{ stats.upcoming_bookings }}</small>
+                </div>
+                <a href="{% url 'my_schedule' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Посмотреть расписание →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Мои абонементы</h5>
+                        <h2>{{ stats.active_subscriptions_count }}</h2>
+                    </div>
+                    <i class="fas fa-id-card fa-3x opacity-50"></i>
+                </div>
+                <div class="mt-2">
+                    <small>Всего: {{ stats.total_subscriptions }} | Потрачено: {{ stats.total_spent|floatformat:0 }} руб.</small>
+                </div>
+                <a href="{% url 'my_subscriptions' %}" class="text-white stretched-link text-decoration-none">
+                    <small>Информация об абонементах →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% elif user.role == 'trainer' %}
+    <!-- Статистика для тренеров -->
+    <div class="col-md-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Мои клиенты</h5>
+                        <h2>-</h2>
+                    </div>
+                    <i class="fas fa-users fa-3x opacity-50"></i>
+                </div>
+                <a href="#" class="text-white stretched-link text-decoration-none">
+                    <small>Посмотреть клиентов →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Расписание</h5>
+                        <h2>-</h2>
+                    </div>
+                    <i class="fas fa-calendar-alt fa-3x opacity-50"></i>
+                </div>
+                <a href="#" class="text-white stretched-link text-decoration-none">
+                    <small>Моё расписание →</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Для других ролей (если появятся) -->
+    <div class="col-12">
+        <div class="card bg-secondary text-white">
+            <div class="card-body text-center">
+                <h5 class="card-title">Добро пожаловать!</h5>
+                <p>Ваш профиль был успешно создан. Ожидайте подтверждения администратора.</p>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+<!-- Дополнительная статистика для админов и менеджеров -->
+{% if user.role == 'admin' or user.role == 'manager' or user.is_superuser %}
+<div class="row mb-4">
+    <!-- Популярные специализации тренеров -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Специализации тренеров</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.specializations %}
+                <div class="list-group">
+                    {% for spec in stats.specializations %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ spec.specialization }}
+                        <span class="badge bg-primary rounded-pill">{{ spec.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">Нет данных о специализациях</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Популярные услуги -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-star"></i> Популярные услуги</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.popular_services %}
+                <div class="list-group">
+                    {% for service in stats.popular_services %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ service.service_name }}</h6>
+                                <small class="text-muted">{{ service.price }} руб. • {{ service.duration }} мин.</small>
+                            </div>
+                            <span class="badge bg-success rounded-pill">{{ service.sub_count }} абон.</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">Нет данных о популярных услугах</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Последние клиенты -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-users"></i> Последние клиенты</h5>
+        <a href="{% url 'client_list' %}" class="btn btn-sm btn-primary">
+            <i class="fas fa-eye"></i> Все клиенты
+        </a>
+    </div>
+    <div class="card-body">
+        {% if stats.recent_clients %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Фамилия</th>
+                        <th>Телефон</th>
+                        <th>Email</th>
+                        <th>Дата регистрации</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in stats.recent_clients %}
+                    <tr>
+                        <td>{{ client.client_id }}</td>
+                        <td>{{ client.first_name }}</td>
+                        <td>{{ client.last_name }}</td>
+                        <td>{{ client.phone }}</td>
+                        <td>{{ client.email|default:"—" }}</td>
+                        <td>{{ client.created_at|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Клиенты ещё не добавлены</p>
+            <a href="{% url 'client_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Добавить первого клиента
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Активные абонементы -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-id-card"></i> Активные абонементы</h5>
+        <a href="{% url 'subscription_list' %}" class="btn btn-sm btn-success">
+            <i class="fas fa-eye"></i> Все абонементы
+        </a>
+    </div>
+    <div class="card-body">
+        {% if stats.active_subscriptions %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Клиент</th>
+                        <th>Услуга</th>
+                        <th>Начало</th>
+                        <th>Окончание</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in stats.active_subscriptions %}
+                    <tr>
+                        <td>#{{ sub.subscription_id }}</td>
+                        <td>{{ sub.client.full_name }}</td>
+                        <td>{{ sub.service.service_name }}</td>
+                        <td>{{ sub.start_date|date:"d.m.Y" }}</td>
+                        <td>{{ sub.end_date|date:"d.m.Y" }}</td>
+                        <td>
+                            <span class="badge bg-{% if sub.status == 'active' %}success{% elif sub.status == 'expired' %}danger{% else %}warning{% endif %}">
+                                {{ sub.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-id-card fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Активных абонементов нет</p>
+            <a href="{% url 'subscription_create' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Создать абонемент
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Последние записи на занятия -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Последние записи</h5>
+        <a href="{% url 'manage_bookings' %}" class="btn btn-sm btn-info">
+            <i class="fas fa-eye"></i> Все записи
+        </a>
+    </div>
+    <div class="card-body">
+        {% if stats.recent_bookings %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Клиент</th>
+                        <th>Услуга</th>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Тренер</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in stats.recent_bookings %}
+                    <tr>
+                        <td>#{{ booking.booking_id }}</td>
+                        <td>{{ booking.client.full_name }}</td>
+                        <td>{{ booking.service.service_name }}</td>
+                        <td>{{ booking.booking_date|date:"d.m.Y" }}</td>
+                        <td>{{ booking.start_time|time:"H:i" }}-{{ booking.end_time|time:"H:i" }}</td>
+                        <td>{{ booking.trainer.full_name|default:"—" }}</td>
+                        <td>
+                            <span class="badge bg-{% if booking.status == 'scheduled' %}info{% elif booking.status == 'completed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Записей на занятия нет</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Информация о пользователе -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Информация о вашей роли</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Ваши права:</h6>
+                <ul>
+                    {% if user.role == 'admin' or user.is_superuser %}
+                    <li>Полный доступ ко всем разделам</li>
+                    <li>Управление пользователями</li>
+                    <li>Просмотр всех отчётов</li>
+                    {% elif user.role == 'manager' %}
+                    <li>Управление клиентами, тренерами, услугами</li>
+                    <li>Создание и редактирование абонементов</li>
+                    <li>Просмотр статистики</li>
+                    {% elif user.role == 'trainer' %}
+                    <li>Просмотр своего расписания</li>
+                    <li>Отметка посещений клиентов</li>
+                    {% elif user.role == 'client' %}
+                    <li>Просмотр своих абонементов</li>
+                    <li>Запись на занятия</li>
+                    <li>Просмотр истории посещений</li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Быстрые действия:</h6>
+                <div class="d-grid gap-2">
+                    {% if user.role == 'admin' or user.role == 'manager' or user.is_superuser %}
+                    <a href="{% url 'client_create' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-user-plus"></i> Добавить клиента
+                    </a>
+                    <a href="{% url 'subscription_list' %}" class="btn btn-outline-success">
+                        <i class="fas fa-id-card"></i> Управление абонементами
+                    </a>
+                    <a href="{% url 'reports_dashboard' %}" class="btn btn-outline-info">
+                        <i class="fas fa-chart-bar"></i> Отчёты
+                    </a>
+                    {% elif user.role == 'client' %}
+                    <a href="{% url 'my_schedule' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-calendar-check"></i> Мои занятия
+                    </a>
+                    <a href="{% url 'my_subscriptions' %}" class="btn btn-outline-success">
+                        <i class="fas fa-credit-card"></i> Мой абонемент
+                    </a>
+                    <a href="{% url 'book_training' %}" class="btn btn-outline-info">
+                        <i class="fas fa-calendar-plus"></i> Запись на занятие
+                    </a>
+                    {% elif user.role == 'trainer' %}
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="fas fa-calendar-alt"></i> Моё расписание
+                    </a>
+                    <a href="#" class="btn btn-outline-success">
+                        <i class="fas fa-users"></i> Мои клиенты
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-user-cog"></i> Настройки профиля
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

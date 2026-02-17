@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block title %}Приобретение абонемента{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-shopping-cart"></i> Приобретение абонемента
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'my_subscriptions' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i> Назад
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Выбор услуги</h5>
+            </div>
+            <div class="card-body">
+                {% if services %}
+                <form method="post" id="buySubscriptionForm">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        {% for service in services %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 service-card" data-service-id="{{ service.pk }}" data-service-price="{{ service.price }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ service.service_name }}</h5>
+                                    <h3 class="text-primary mb-3">{{ service.price }} руб.</h3>
+
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-clock text-muted me-2"></i>
+                                            <span>{{ service.duration }} минут</span>
+                                        </li>
+                                        {% if service.description %}
+                                        <li class="mb-2">
+                                            <i class="fas fa-info-circle text-muted me-2"></i>
+                                            <span>{{ service.description|truncatechars:100 }}</span>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input service-radio" type="radio"
+                                               name="service" id="service{{ service.pk }}"
+                                               value="{{ service.pk }}" required>
+                                        <label class="form-check-label" for="service{{ service.pk }}">
+                                            Выбрать эту услугу
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Выбор срока</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Количество месяцев</label>
+                                    <select class="form-select" name="months" id="monthsSelect" required>
+                                        <option value="1" selected>1 месяц</option>
+                                        <option value="3">3 месяца</option>
+                                        <option value="6">6 месяцев</option>
+                                        <option value="12">12 месяцев</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Итоговая стоимость</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="totalPrice"
+                                               value="0" readonly style="font-size: 1.2rem; font-weight: bold;">
+                                        <span class="input-group-text">руб.</span>
+                                    </div>
+                                    <small class="text-muted">Цена за месяц × количество месяцев</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Подтверждение</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                Абонемент будет активен с сегодняшнего дня на выбранный срок.
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-shopping-cart"></i> Приобрести абонемент
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-list-alt fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">Нет доступных услуг</h4>
+                    <p class="text-muted">В данный момент нет активных услуг для покупки</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Информация о клиенте -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-user"></i> Ваш профиль</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Клиент:</strong><br>{{ client.first_name }} {{ client.last_name }}</p>
+                <p><strong>Телефон:</strong><br>{{ client.phone }}</p>
+                {% if client.email %}
+                <p><strong>Email:</strong><br>{{ client.email }}</p>
+                {% endif %}
+                <hr>
+                <a href="{% url 'profile' %}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-edit"></i> Редактировать профиль
+                </a>
+            </div>
+        </div>
+
+        <!-- Активные абонементы -->
+        {% if active_subscriptions %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-id-card"></i> Ваши активные абонементы</h6>
+            </div>
+            <div class="card-body">
+                {% for sub in active_subscriptions|slice:":3" %}
+                <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                    <p class="mb-1"><strong>{{ sub.service.service_name }}</strong></p>
+                    <p class="mb-1 small text-muted">до {{ sub.end_date|date:"d.m.Y" }}</p>
+                    <span class="badge bg-success">Активен</span>
+                </div>
+                {% endfor %}
+                {% if active_subscriptions|length > 3 %}
+                <div class="text-center">
+                    <a href="{% url 'my_subscriptions' %}" class="btn btn-sm btn-outline-secondary">
+                        Показать все ({{ active_subscriptions|length }})
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .service-card {
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        border: 2px solid transparent;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .service-card.selected {
+        border-color: #4361ee;
+        background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .service-radio:checked ~ .service-card {
+        border-color: #4361ee;
+        background-color: rgba(67, 97, 238, 0.05);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const serviceCards = document.querySelectorAll('.service-card');
+        const monthsSelect = document.getElementById('monthsSelect');
+        const totalPriceInput = document.getElementById('totalPrice');
+
+        let selectedServicePrice = 0;
+
+        // Обработка выбора услуги
+        serviceCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const radio = this.querySelector('.service-radio');
+                radio.checked = true;
+
+                // Снимаем выделение со всех карточек
+                serviceCards.forEach(c => c.classList.remove('selected'));
+                // Добавляем выделение выбранной
+                this.classList.add('selected');
+
+                selectedServicePrice = parseFloat(this.dataset.servicePrice);
+                updateTotalPrice();
+            });
+        });
+
+        // Обработка изменения количества месяцев
+        monthsSelect.addEventListener('change', updateTotalPrice);
+
+        function updateTotalPrice() {
+            const months = parseInt(monthsSelect.value);
+            const total = selectedServicePrice * months;
+            totalPriceInput.value = total.toLocaleString('ru-RU');
+        }
+
+        // Инициализация
+        const firstRadio = document.querySelector('.service-radio');
+        if (firstRadio) {
+            firstRadio.checked = true;
+            const firstCard = firstRadio.closest('.service-card');
+            firstCard.classList.add('selected');
+            selectedServicePrice = parseFloat(firstCard.dataset.servicePrice);
+            updateTotalPrice();
+        }
+
+        // Валидация формы
+        document.getElementById('buySubscriptionForm').addEventListener('submit', function(e) {
+            if (!selectedServicePrice) {
+                e.preventDefault();
+                alert('Пожалуйста, выберите услугу');
+                return false;
+            }
+
+            if (confirm('Вы уверены, что хотите приобрести этот абонемент?')) {
+                return true;
+            } else {
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}

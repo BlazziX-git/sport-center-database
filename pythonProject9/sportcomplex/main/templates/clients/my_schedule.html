@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои занятия{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-calendar-check"></i> Мои занятия
+{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{% url 'book_training' %}" class="btn btn-primary">
+        <i class="fas fa-calendar-plus"></i> Записаться на занятие
+    </a>
+    <a href="{% url 'quick_book' %}" class="btn btn-outline-primary">
+        <i class="fas fa-bolt"></i> Быстрая запись
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Статистика -->
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Предстоящие</h5>
+                        <h2>{{ upcoming_bookings|length }}</h2>
+                    </div>
+                    <i class="fas fa-calendar-alt fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Сегодня</h5>
+                        <h2>{{ today_bookings|default:"0" }}</h2>
+                    </div>
+                    <i class="fas fa-calendar-day fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Завершено</h5>
+                        <h2>{{ completed_bookings|default:"0" }}</h2>
+                    </div>
+                    <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Активные абон.</h5>
+                        <h2>{{ active_subscriptions.count }}</h2>
+                    </div>
+                    <i class="fas fa-id-card fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Предстоящие занятия -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Предстоящие занятия</h5>
+        <span class="badge bg-primary">{{ upcoming_bookings|length }} записей</span>
+    </div>
+    <div class="card-body">
+        {% if upcoming_bookings %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Услуга</th>
+                        <th>Тренер</th>
+                        <th>Зал</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in upcoming_bookings %}
+                    <tr>
+                        <td>
+                            <strong>{{ booking.booking_date|date:"d.m.Y" }}</strong><br>
+                            <small class="text-muted">{{ booking.booking_date|date:"l" }}</small>
+                        </td>
+                        <td>{{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}</td>
+                        <td>
+                            <strong>{{ booking.service.service_name }}</strong><br>
+                            <small class="text-muted">{{ booking.service.duration }} мин.</small>
+                        </td>
+                        <td>
+                            {% if booking.trainer %}
+                            {{ booking.trainer.full_name }}<br>
+                            <small class="text-muted">
+                                <i class="fas fa-star text-warning"></i> {{ booking.trainer.experience_years }} лет опыта
+                            </small>
+                            {% else %}
+                            <span class="text-muted">Не назначен</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ booking.room }}</td>
+                        <td>
+                            <span class="badge bg-success">{{ booking.get_status_display }}</span>
+                        </td>
+                        <td>
+                            {% if booking.can_be_cancelled %}
+                            <a href="{% url 'cancel_booking' booking.pk %}" class="btn btn-sm btn-outline-danger cancel-booking-btn"
+                               data-booking-date="{{ booking.booking_date|date:'d.m.Y' }}"
+                               data-booking-time="{{ booking.start_time|time:'H:i' }}">
+                                <i class="fas fa-times"></i> Отменить
+                            </a>
+                            {% else %}
+                            <button class="btn btn-sm btn-outline-secondary" disabled title="Нельзя отменить">
+                                <i class="fas fa-lock"></i> Заблокировано
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-calendar fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Нет предстоящих занятий</h4>
+            <p class="text-muted mb-4">Запишитесь на занятия, чтобы увидеть их здесь</p>
+            <div class="d-flex justify-content-center gap-2">
+                <a href="{% url 'book_training' %}" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus"></i> Записаться на занятие
+                </a>
+                <a href="{% url 'quick_book' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-bolt"></i> Быстрая запись
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- История занятий -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-history"></i> История занятий</h5>
+    </div>
+    <div class="card-body">
+        {% if past_bookings %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Услуга</th>
+                        <th>Тренер</th>
+                        <th>Статус</th>
+                        <th>Отзыв</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in past_bookings %}
+                    <tr>
+                        <td>{{ booking.booking_date|date:"d.m.Y" }}</td>
+                        <td>{{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}</td>
+                        <td>{{ booking.service.service_name }}</td>
+                        <td>
+                            {% if booking.trainer %}
+                            {{ booking.trainer.full_name }}
+                            {% else %}
+                            <span class="text-muted">Не назначен</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if booking.status == 'completed' %}primary{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if booking.status == 'completed' %}
+                            <button class="btn btn-sm btn-outline-info add-review-btn" data-booking-id="{{ booking.pk }}">
+                                <i class="fas fa-star"></i> Оценить
+                            </button>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+            <p class="text-muted">История занятий пуста</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Быстрая запись -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-bolt"></i> Быстрая запись</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for service in active_services|slice:":4" %}
+            <div class="col-md-3 mb-3">
+                <div class="card card-hover text-center h-100">
+                    <div class="card-body">
+                        {% if service.service_name == 'Силовая тренировка' %}
+                        <i class="fas fa-dumbbell fa-2x text-primary mb-2"></i>
+                        {% elif service.service_name == 'Кардио тренировка' %}
+                        <i class="fas fa-running fa-2x text-success mb-2"></i>
+                        {% elif service.service_name == 'Бассейн' %}
+                        <i class="fas fa-water fa-2x text-info mb-2"></i>
+                        {% elif service.service_name == 'Йога' %}
+                        <i class="fas fa-spa fa-2x text-warning mb-2"></i>
+                        {% else %}
+                        <i class="fas fa-dumbbell fa-2x text-secondary mb-2"></i>
+                        {% endif %}
+                        <h6>{{ service.service_name }}</h6>
+                        <p class="text-muted small">{{ service.duration }} мин.</p>
+                        <p class="h5 text-primary mb-3">{{ service.price }} руб.</p>
+                        <a href="{% url 'quick_book_with_service' service.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                            Быстрая запись
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-hover {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid #eee;
+        height: 100%;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        border-color: #4361ee;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Обработчик для кнопок отмены записи
+        document.querySelectorAll('.cancel-booking-btn').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                var bookingDate = this.getAttribute('data-booking-date');
+                var bookingTime = this.getAttribute('data-booking-time');
+                var bookingId = this.getAttribute('href').split('/').filter(Boolean).pop();
+
+                if (confirm('Вы уверены, что хотите отменить запись на ' + bookingDate + ' в ' + bookingTime + '?')) {
+                    window.location.href = this.getAttribute('href');
+                }
+            });
+        });
+
+        // Обработчик для кнопок добавления отзыва
+        document.querySelectorAll('.add-review-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var bookingId = this.getAttribute('data-booking-id');
+                addReview(bookingId);
+            });
+        });
+
+        function addReview(bookingId) {
+            // Здесь будет функция для добавления отзыва
+            alert('Функция отзывов находится в разработке');
+        }
+
+        // Автоматическое обновление статуса занятий
+        const today = new Date();
+        const timeNow = today.getHours() * 60 + today.getMinutes();
+
+        // Здесь можно добавить логику для автоматического обновления статуса
+        // Например, AJAX запрос для обновления статуса прошедших занятий
+    });
+</script>
+{% endblock %}

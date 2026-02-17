@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ client.full_name }}{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-user-circle"></i> {{ client.full_name }}
+<small class="text-muted">ID: {{ client.client_id }}</small>
+{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{% url 'client_edit' client.client_id %}" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Редактировать
+    </a>
+    <a href="{% url 'client_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Назад
+    </a>
+    {% if user.role == 'admin' or user.is_superuser %}
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        <i class="fas fa-trash"></i> Удалить
+    </button>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Основная информация -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Основная информация</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 fw-bold">Имя:</div>
+                    <div class="col-md-8">{{ client.first_name }}</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 fw-bold">Фамилия:</div>
+                    <div class="col-md-8">{{ client.last_name }}</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 fw-bold">Телефон:</div>
+                    <div class="col-md-8">
+                        <a href="tel:{{ client.phone }}" class="text-decoration-none">
+                            <i class="fas fa-phone"></i> {{ client.phone }}
+                        </a>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 fw-bold">Email:</div>
+                    <div class="col-md-8">
+                        {% if client.email %}
+                        <a href="mailto:{{ client.email }}" class="text-decoration-none">
+                            <i class="fas fa-envelope"></i> {{ client.email }}
+                        </a>
+                        {% else %}
+                        <span class="text-muted">Не указан</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 fw-bold">Дата рождения:</div>
+                    <div class="col-md-8">
+                        {{ client.birth_date|default:"Не указана" }}
+                        {% if client.birth_date %}
+                        ({{ client.age }} лет)
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 fw-bold">Дата регистрации:</div>
+                    <div class="col-md-8">
+                        {{ client.created_at|date:"d.m.Y H:i" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Действия с клиентом -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-success">
+                        <i class="fas fa-id-card"></i> Создать абонемент
+                    </a>
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus"></i> Записать на занятие
+                    </a>
+                    <a href="#" class="btn btn-info">
+                        <i class="fas fa-file-invoice-dollar"></i> Создать счёт
+                    </a>
+                    <a href="{% url 'client_edit' client.client_id %}" class="btn btn-outline-warning">
+                        <i class="fas fa-user-edit"></i> Изменить данные
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Абонементы клиента -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-id-card"></i> Абонементы клиента</h5>
+                <a href="#" class="btn btn-sm btn-success">
+                    <i class="fas fa-plus"></i> Добавить
+                </a>
+            </div>
+            <div class="card-body">
+                {% if subscriptions %}
+                <div class="list-group">
+                    {% for sub in subscriptions %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <h6 class="mb-1">
+                                <i class="fas fa-dumbbell"></i> {{ sub.service.service_name }}
+                            </h6>
+                            <span class="badge bg-{% if sub.status == 'active' %}success{% elif sub.status == 'expired' %}danger{% else %}warning{% endif %}">
+                                {{ sub.get_status_display }}
+                            </span>
+                        </div>
+                        <p class="mb-1">
+                            <small>
+                                <i class="far fa-calendar"></i> 
+                                {{ sub.start_date|date:"d.m.Y" }} — {{ sub.end_date|date:"d.m.Y" }}
+                            </small>
+                        </p>
+                        <p class="mb-1">
+                            <small>
+                                <i class="fas fa-money-bill-wave"></i> 
+                                Оплачено: {{ sub.price_paid }} руб.
+                            </small>
+                        </p>
+                        <div class="mt-2">
+                            <a href="#" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-eye"></i> Подробнее
+                            </a>
+                            {% if sub.is_active %}
+                            <a href="#" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-check-circle"></i> Отметить посещение
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-id-card fa-3x text-muted mb-3"></i>
+                    <h5>Нет абонементов</h5>
+                    <p class="text-muted">У этого клиента пока нет активных абонементов</p>
+                    <a href="#" class="btn btn-success">
+                        <i class="fas fa-plus-circle"></i> Создать первый абонемент
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- История посещений -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Последние посещения</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Функционал посещений в разработке</p>
+                    <button class="btn btn-outline-primary" disabled>
+                        <i class="fas fa-clock"></i> Скоро будет доступно
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно удаления -->
+{% if user.role == 'admin' or user.is_superuser %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Удаление клиента
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <h6 class="alert-heading">Внимание!</h6>
+                    <p class="mb-0">Вы собираетесь удалить клиента <strong>{{ client.full_name }}</strong>.</p>
+                </div>
+                <p>Это действие приведёт к:</p>
+                <ul>
+                    <li>Удалению всех данных клиента</li>
+                    <li>Удалению всех абонементов клиента</li>
+                    <li>Удалению истории посещений</li>
+                </ul>
+                <p class="text-danger">
+                    <i class="fas fa-info-circle"></i> Это действие нельзя отменить!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <form action="{% url 'client_delete' client.client_id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Удалить навсегда
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

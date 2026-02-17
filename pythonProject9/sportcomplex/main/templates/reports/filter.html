@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+
+{% block title %}Фильтрация данных - СпортКомплекс{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-filter"></i> Фильтрация данных
+<small class="text-muted">LINQ-подобные запросы на Python</small>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'reports_dashboard' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i> Назад к отчетам
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-flask"></i> Фильтрация данных</h5>
+            </div>
+            <div class="card-body">
+                <p class="lead">
+                    Реализация методов фильтрации, аналогичных LINQ-запросам в C#, с использованием библиотеки pandas.
+                </p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    Генерация 10000 тестовых пользователей и применение 9 различных фильтров.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Фильтр 1</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>wallet > 100000</strong></p>
+                <p class="text-muted small">Пользователи с балансом кошелька более 100 000 руб.</p>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="filter_type" value="1">
+                    <input type="hidden" name="data_type" value="users">
+                    <input type="hidden" name="count" value="10000">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-play"></i> Применить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Фильтр 2</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>age >= 18 and age <= 25 and wallet > 125000</strong></p>
+                <p class="text-muted small">Молодые пользователи 18-25 лет с высоким балансом</p>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="filter_type" value="2">
+                    <input type="hidden" name="data_type" value="users">
+                    <input type="hidden" name="count" value="10000">
+                    <button type="submit" class="btn btn-success btn-sm w-100">
+                        <i class="fas fa-play"></i> Применить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Фильтр 3</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>age > 50 AND registration_date >= 2020</strong></p>
+                <p class="text-muted small">Пользователи старше 50 лет, зарегистрировавшиеся после 2020 года</p>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="filter_type" value="3">
+                    <input type="hidden" name="data_type" value="users">
+                    <input type="hidden" name="count" value="10000">
+                    <button type="submit" class="btn btn-info btn-sm w-100">
+                        <i class="fas fa-play"></i> Применить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">Фильтр 4</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>email contains gmail AND wallet > 50000 AND is_subscribed</strong></p>
+                <p class="text-muted small">Пользователи с Gmail, балансом >50000 и активной подпиской</p>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="filter_type" value="4">
+                    <input type="hidden" name="data_type" value="users">
+                    <input type="hidden" name="count" value="10000">
+                    <button type="submit" class="btn btn-warning btn-sm w-100">
+                        <i class="fas fa-play"></i> Применить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Фильтр 5</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>age < 18 AND email contains yahoo AND wallet < 25000</strong></p>
+                <p class="text-muted small">Несовершеннолетние пользователи с Yahoo и низким балансом</p>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="filter_type" value="5">
+                    <input type="hidden" name="data_type" value="users">
+                    <input type="hidden" name="count" value="10000">
+                    <button type="submit" class="btn btn-danger btn-sm w-100">
+                        <i class="fas fa-play"></i> Применить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Фильтр 6</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>age > 100 AND last_online = today</strong></p>
+                <p class="text-muted small">Долгожители, заходившие сегодня</p>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="filter_type" value="6">
+                    <input type="hidden" name="data_type" value="users">
+                    <input type="hidden" name="count" value="10000">
+                    <button type="submit" class="btn btn-secondary btn-sm w-100">
+                        <i class="fas fa-play"></i> Применить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Фильтр 7</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>wallet > 100000, сортировка по registration_date</strong></p>
+                <p class="text-muted small">Топ-50 пользователей с балансом >100000 по дате регистрации</p>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="filter_type" value="7">
+                    <input type="hidden" name="data_type" value="users">
+                    <input type="hidden" name="count" value="10000">
+                    <button type="submit" class="btn btn-dark btn-sm w-100">
+                        <i class="fas fa-play"></i> Применить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="mb-0">Фильтр 8</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>день рождения сегодня, age > 21</strong></p>
+                <p class="text-muted small">Именинники сегодня, старше 21 года</p>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="filter_type" value="8">
+                    <input type="hidden" name="data_type" value="users">
+                    <input type="hidden" name="count" value="10000">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-play"></i> Применить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Фильтр 9</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>is_subscribed AND total_spent > 400000 AND age > 25</strong></p>
+                <p class="text-muted small">VIP-клиенты с подпиской, потратившие более 400000 руб.</p>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="filter_type" value="9">
+                    <input type="hidden" name="data_type" value="users">
+                    <input type="hidden" name="count" value="10000">
+                    <button type="submit" class="btn btn-success btn-sm w-100">
+                        <i class="fas fa-play"></i> Применить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if filter_results %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-table"></i> Результаты: {{ filter_name }}
+                </h5>
+                <div>
+                    <span class="badge bg-light text-dark p-2 me-2">
+                        Найдено: {{ filtered_count }} из {{ total_count }}
+                    </span>
+                    <a href="{% url 'export_filter_to_csv' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-download"></i> Экспорт в CSV
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    {{ filter_results|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

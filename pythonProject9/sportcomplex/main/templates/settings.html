@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Настройки{% endblock %}
+
+{% block page_title %}Настройки системы{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Настройки системы</h5>
+                <p class="card-text">Модуль настроек находится в разработке.</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <h6><i class="fas fa-cog text-primary"></i> Основные настройки</h6>
+                                <small class="text-muted">Общие параметры системы</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-warning">
+                            <div class="card-body">
+                                <h6><i class="fas fa-users text-warning"></i> Настройки пользователей</h6>
+                                <small class="text-muted">Роли и разрешения</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h6><i class="fas fa-chart-line text-success"></i> Настройки отчётов</h6>
+                                <small class="text-muted">Параметры аналитики</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Для изменения системных настроек обратитесь к администратору.
+                </div>
+                
+                <a href="{% url 'index' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> На главную
+                </a>
+                <a href="{% url 'profile' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-user"></i> Личный профиль
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

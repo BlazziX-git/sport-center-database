@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление услуги{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-exclamation-triangle text-danger"></i> Удаление услуги
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'service_detail' service.service_id %}" class="btn btn-info">
+    <i class="fas fa-arrow-left"></i> Вернуться к услуге
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-radiation"></i> Критическое действие
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-trash-alt fa-4x text-danger mb-3"></i>
+                    <h4>Вы собираетесь удалить услугу</h4>
+                    <p class="lead">Это затронет всех клиентов с этой услугой!</p>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6>Информация об услуге:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>ID:</strong> {{ service.service_id }}</p>
+                                <p><strong>Название:</strong> {{ service.service_name }}</p>
+                                <p><strong>Цена:</strong> {{ service.price }} руб.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Длительность:</strong> {{ service.duration }} мин.</p>
+                                <p><strong>Статус:</strong> 
+                                    {% if service.is_active %}
+                                    <span class="badge bg-success">Активна</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Неактивна</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Добавлена:</strong> {{ service.created_at|date:"d.m.Y" }}</p>
+                            </div>
+                        </div>
+                        {% if service.description %}
+                        <hr>
+                        <p><strong>Описание:</strong> {{ service.description|truncatechars:100 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="alert alert-danger">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-exclamation-circle"></i> Последствия удаления услуги:
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Все абонементы на эту услугу будут аннулированы</li>
+                        <li>Клиенты потеряют доступ к услуге</li>
+                        <li>Необходимо будет возвращать деньги клиентам</li>
+                        <li>История продаж этой услуги будет удалена</li>
+                        <li>Невозможность восстановления данных</li>
+                    </ul>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-lightbulb"></i> Альтернативные решения:
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Деактивация:</strong></p>
+                            <a href="{% url 'service_edit' service.service_id %}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-power-off"></i> Деактивировать услугу
+                            </a>
+                            <p class="small text-muted mt-1">Услуга останется в системе, но не будет доступна для покупки</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Изменение:</strong></p>
+                            <a href="{% url 'service_edit' service.service_id %}" class="btn btn-sm btn-info">
+                                <i class="fas fa-edit"></i> Изменить параметры
+                            </a>
+                            <p class="small text-muted mt-1">Обновить цену, название или описание</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a href="{% url 'service_edit' service.service_id %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Редактировать вместо удаления
+                    </a>
+                    <a href="{% url 'service_detail' service.service_id %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Отмена
+                    </a>
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" 
+                                onclick="return confirm('ВНИМАНИЕ! Это действие затронет клиентов. Вы уверены?')">
+                            <i class="fas fa-trash"></i> Подтвердить удаление
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card bg-light mt-4">
+                    <div class="card-body">
+                        <h6><i class="fas fa-file-contract"></i> Юридическая информация:</h6>
+                        <p class="small text-muted mb-0">
+                            Удаление услуги может нарушать условия договоров с клиентами. 
+                            Рекомендуется проконсультироваться с юристом перед удалением 
+                            активной услуги, на которую есть действующие абонементы.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

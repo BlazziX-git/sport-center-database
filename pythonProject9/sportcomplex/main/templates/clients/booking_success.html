@@ -1,0 +1,35 @@
+<div class="modal fade" id="bookingSuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle"></i> Успешная запись!
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-4">
+                    <i class="fas fa-calendar-check fa-4x text-success"></i>
+                </div>
+                <h4 class="mb-3" id="bookingSuccessMessage"></h4>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Информация:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Вы получите SMS-напоминание за 3 часа до занятия</li>
+                        <li>Отменить запись можно не позднее чем за 2 часа до начала</li>
+                        <li>Приходите за 10-15 минут до начала занятия</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Закрыть
+                </button>
+                <button type="button" class="btn btn-success" id="goToScheduleBtn">
+                    <i class="fas fa-calendar-alt"></i> Перейти к моим занятиям
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль - Спортивный Комплекс{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-user"></i> Мой профиль
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <!-- Информация о пользователе -->
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <div class="avatar-circle">
+                        <span>{{ user.userName|first|upper }}</span>
+                    </div>
+                    <h4>{{ user.userName }}</h4>
+                    <span class="badge bg-{% if user.role == 'admin' %}danger{% elif user.role == 'manager' %}warning{% elif user.role == 'trainer' %}info{% else %}secondary{% endif %}">
+                        {{ user.get_role_display }}
+                    </span>
+                </div>
+                
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-envelope me-2"></i> Email</span>
+                        <span>{{ user.email|default:"Не указан" }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-phone me-2"></i> Телефон</span>
+                        <span>{{ user.phone|default:"Не указан" }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-birthday-cake me-2"></i> Дата рождения</span>
+                        <span>{{ user.birth_date|date:"d.m.Y"|default:"Не указана" }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-calendar-alt me-2"></i> Дата регистрации</span>
+                        <span>{{ user.date_joined|date:"d.m.Y"|default:"Неизвестно" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Статистика для клиентов -->
+        {% if user.role == 'client' and client %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-chart-line"></i> Моя статистика</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <h3 class="text-primary">{{ active_subscriptions_count }}</h3>
+                    <p class="text-muted">Активных абонементов</p>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-success">{{ total_spent }} руб.</h3>
+                    <p class="text-muted">Всего потрачено</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-8">
+        <!-- Форма редактирования профиля -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-edit"></i> Редактирование профиля</h6>
+            </div>
+            <div class="card-body">
+                <form method="post" id="profileForm">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Ошибка!</strong> Пожалуйста, исправьте ошибки ниже.
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="text-danger small">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Телефон</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <div class="text-danger small">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Дата рождения</label>
+                            {{ form.birth_date }}
+                            {% if form.birth_date.errors %}
+                            <div class="text-danger small">{{ form.birth_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h6 class="mb-3"><i class="fas fa-key"></i> Смена пароля</h6>
+                    <p class="text-muted small mb-3">Оставьте эти поля пустыми, если не хотите менять пароль</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Текущий пароль</label>
+                            {{ form.current_password }}
+                            {% if form.current_password.errors %}
+                            <div class="text-danger small">{{ form.current_password.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Новый пароль</label>
+                            {{ form.new_password }}
+                            {% if form.new_password.errors %}
+                            <div class="text-danger small">{{ form.new_password.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Подтвердите пароль</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}
+                            <div class="text-danger small">{{ form.confirm_password.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Быстрые действия -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-bolt"></i> Быстрые действия</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if user.role == 'admin' or user.role == 'manager' %}
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'client_create' %}" class="card card-hover text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-plus fa-2x text-primary mb-2"></i>
+                                <h6>Добавить клиента</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'subscription_create' %}" class="card card-hover text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-id-card fa-2x text-success mb-2"></i>
+                                <h6>Создать абонемент</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'service_list' %}" class="card card-hover text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-list-alt fa-2x text-warning mb-2"></i>
+                                <h6>Управление услугами</h6>
+                            </div>
+                        </a>
+                    </div>
+                    {% elif user.role == 'client' %}
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'my_schedule' %}" class="card card-hover text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-calendar-check fa-2x text-primary mb-2"></i>
+                                <h6>Мои занятия</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'my_subscriptions' %}" class="card card-hover text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-credit-card fa-2x text-success mb-2"></i>
+                                <h6>Мой абонемент</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'buy_subscription' %}" class="card card-hover text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-shopping-cart fa-2x text-warning mb-2"></i>
+                                <h6>Купить абонемент</h6>
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'settings' %}" class="card card-hover text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-cog fa-2x text-info mb-2"></i>
+                                <h6>Настройки</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'index' %}" class="card card-hover text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-home fa-2x text-dark mb-2"></i>
+                                <h6>На главную</h6>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(45deg, #4361ee, #7209b7);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+    
+    .avatar-circle span {
+        font-size: 48px;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .list-group-item {
+        border: none;
+        padding: 10px 0;
+    }
+    
+    .card-hover {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid #eee;
+        height: 100%;
+    }
+    
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        border-color: #4361ee;
+    }
+    
+    .card-hover .card-body {
+        padding: 20px 10px;
+    }
+</style>
+{% endblock %}

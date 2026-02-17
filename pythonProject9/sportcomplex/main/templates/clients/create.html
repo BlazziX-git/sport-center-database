@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить клиента{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-user-plus"></i> Добавление нового клиента
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'client_list' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i> Назад к списку
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Имя *</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.first_name.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Фамилия *</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.last_name.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Телефон *</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.phone.errors }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted">Формат: +7 (999) 123-45-67</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.email.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Дата рождения</label>
+                        {{ form.birth_date }}
+                        {% if form.birth_date.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.birth_date.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save"></i> Сохранить клиента
+                        </button>
+                        <a href="{% url 'client_list' %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h6><i class="fas fa-lightbulb"></i> Подсказки:</h6>
+                <ul class="text-muted">
+                    <li>Поля, отмеченные * обязательны для заполнения</li>
+                    <li>Email используется для отправки уведомлений и восстановления пароля</li>
+                    <li>Дата рождения нужна для расчёта возраста и персональных предложений</li>
+                    <li>После создания клиента можно будет добавить ему абонемент</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Автоформат телефона
+    $('#id_phone').on('input', function(e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+        e.target.value = !x[2] ? x[1] : '+' + x[1] + ' (' + x[2] + ') ' + x[3] + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+    });
+</script>
+{% endblock %}
